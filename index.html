@@ -1,7 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Marmite Shrine | Rob Wilson</title>
+    <style>
+        /* CSS - This controls how the site looks */
+        :root {
+            --marmite-yellow: #FFD700;
+            --marmite-black: #1a1a1a;
+            --marmite-red: #D92121;
+            --marmite-green: #008000;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
+            background-color: var(--marmite-yellow);
+            color: var(--marmite-black);
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        /* The Hero Section */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #ffe033 0%, #e6c200 100%);
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 5rem;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1;
+            text-shadow: 4px 4px 0px #fff;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            background-color: var(--marmite-black);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transform: rotate(-2deg);
+        }
+
+        /* The Jar Graphic (made purely with CSS code!) */
+        .jar-container {
+            font-size: 100px;
+            margin: 40px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Buttons */
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        button {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            border: 4px solid var(--marmite-black);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 5px 5px 0px var(--marmite-black);
+        }
+
+        .btn-love {
+            background-color: var(--marmite-red);
+            color: white;
+        }
+
+        .btn-hate {
+            background-color: white;
+            color: var(--marmite-black);
+        }
+
+        button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 3px 3px 0px var(--marmite-black);
+        }
+
+        button:active {
+            transform: translate(5px, 5px);
+            box-shadow: 0px 0px 0px var(--marmite-black);
+        }
+
+        /* The Content Section */
+        .facts {
+            background-color: var(--marmite-black);
+            color: white;
+            padding: 60px 20px;
+        }
+
+        .fact-card {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 2px solid var(--marmite-yellow);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        footer {
+            padding: 20px;
+            font-size: 0.8rem;
+            background-color: var(--marmite-red);
+            color: white;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            h1 { font-size: 3rem; }
+            .button-container { flex-direction: column; }
+        }
+    </style>
+</head>
 <body>
-    <h1>Hello, World!</h1>
-    <p>This is Rob Wilson's first live website. It should be working properly now.</p>
+
+    <div class="hero">
+        <div class="jar-container">🍯</div>
+        <h1>Love it.<br>Or Hate it.</h1>
+        <div class="subtitle">Rob Wilson definitely loves it.</div>
+
+        <div class="button-container">
+            <button class="btn-love" onclick="vote('love')">I LOVE IT ❤️</button>
+            <button class="btn-hate" onclick="vote('hate')">I HATE IT 🤮</button>
+        </div>
+        
+        <p id="result-text" style="margin-top: 20px; font-weight: bold; height: 20px;"></p>
+    </div>
+
+    <div class="facts">
+        <div class="fact-card">
+            <h2>Did you know?</h2>
+            <p>Marmite was invented by accident. A German scientist named Justus von Liebig discovered that brewer's yeast could be concentrated, bottled, and eaten. The British loved it. The rest of the world remains confused.</p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 Rob Wilson. Built on GitHub Pages.
+    </footer>
+
+    <script>
+        // JavaScript - This controls the logic
+        let loveCount = 100;
+        let hateCount = 0;
+
+        function vote(choice) {
+            const resultText = document.getElementById('result-text');
+            
+            if (choice === 'love') {
+                loveCount++;
+                resultText.innerText = "Make that " + loveCount + " fans! You have great taste.";
+                resultText.style.color = "#D92121";
+                launchConfetti();
+            } else {
+                resultText.innerText = "Your opinion is noted... and ignored. Rob still loves it.";
+                resultText.style.color = "black";
+            }
+        }
+
+        function launchConfetti() {
+            // A simple visual trick changing background briefly
+            document.body.style.backgroundColor = "#fff0a3";
+            setTimeout(() => {
+                document.body.style.backgroundColor = "#FFD700";
+            }, 200);
+        }
+    </script>
 </body>
 </html>
