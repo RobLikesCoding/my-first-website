@@ -3,238 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Roulette | Rob Wilson</title>
+    <title>British Airways Fleet | Rob Wilson</title>
     <style>
-        /* MODERN DARK THEME */
+        /* BA BRANDING COLORS */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f1f5f9;
-            --accent-blue: #3b82f6;
-            --accent-hover: #2563eb;
-            --gold: #fbbf24;
+            --ba-blue: #075AAA;
+            --ba-red: #EB2226;
+            --ba-white: #ffffff;
+            --ba-grey: #f0f0f0;
+            --text-dark: #1f2937;
         }
 
         body {
+            font-family: 'Mylius Modern', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--ba-grey);
             margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            padding: 0;
+            color: var(--text-dark);
         }
 
-        /* BACKGROUND MAP EFFECT */
-        .bg-map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(#3b82f6 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.1;
-            z-index: -1;
-        }
-
-        /* MAIN CONTAINER */
-        .container {
+        /* HEADER */
+        header {
+            background-color: var(--ba-blue);
+            color: white;
+            padding: 40px 20px;
             text-align: center;
-            background-color: var(--card-bg);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            max-width: 90%;
-            width: 500px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 4px solid var(--ba-red);
         }
 
         h1 {
-            font-size: 0.9rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 2rem;
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
         }
 
-        /* THE DESTINATION DISPLAY */
-        .destination-display {
-            font-size: 3.5rem;
-            font-weight: 800;
-            min-height: 160px; /* Keeps layout stable */
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* CONTROLS / FILTER BAR */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--ba-blue);
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn.active {
+            background-color: var(--ba-blue);
+            color: white;
+            border-color: var(--ba-blue);
+        }
+
+        /* FLEET GRID */
+        .fleet-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        /* AIRCRAFT CARD */
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 2rem;
-            line-height: 1.1;
         }
 
-        .country-label {
-            font-size: 1.2rem;
-            font-weight: 400;
-            color: var(--gold);
-            margin-top: 10px;
-            opacity: 0;
-            transition: opacity 0.5s;
+        .card:hover {
+            transform: translateY(-5px);
         }
 
-        .country-label.visible {
-            opacity: 1;
-        }
-
-        /* BUTTONS */
-        button {
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
+        .card-image {
             width: 100%;
-            margin-bottom: 10px;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--ba-red);
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
+        .card-content {
+            padding: 25px;
+            flex-grow: 1;
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        /* THE FLIGHT LINK (Hidden by default) */
-        #flight-link {
-            display: none;
-            text-decoration: none;
-            margin-top: 15px;
-            padding: 15px;
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            border-radius: 10px;
+        .aircraft-type {
+            color: var(--ba-blue);
+            font-size: 0.85rem;
             font-weight: bold;
-            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
-        #flight-link:hover {
-            background-color: var(--gold);
-            color: var(--bg-color);
+        .aircraft-name {
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            font-weight: 800;
         }
 
-        .emoji-icon {
-            font-size: 1.2rem;
-            margin-right: 8px;
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
         }
 
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spec-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .spec-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        /* FOOTER */
         footer {
-            position: absolute;
-            bottom: 20px;
-            color: #475569;
-            font-size: 0.8rem;
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+
+        /* ANIMATION */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.5s ease-out forwards;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="bg-map"></div>
+    <header>
+        <h1>The British Airways Fleet</h1>
+        <div class="subtitle">Curated by Rob Wilson | Future Flight Programme</div>
+    </header>
 
-    <div class="container">
-        <h1>Where are we going, Rob?</h1>
-        
-        <div class="destination-display">
-            <span id="city-text">???</span>
-            <span id="country-text" class="country-label">Spin to decide</span>
-        </div>
+    <!-- Interactive Filters -->
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterFleet('all')">Show All</button>
+        <button class="filter-btn" onclick="filterFleet('Airbus')">Airbus</button>
+        <button class="filter-btn" onclick="filterFleet('Boeing')">Boeing</button>
+        <button class="filter-btn" onclick="filterFleet('Long Haul')">Long Haul</button>
+        <button class="filter-btn" onclick="filterFleet('Short Haul')">Short Haul</button>
+    </div>
 
-        <button onclick="spinGlobe()" id="spin-btn">
-            <span class="emoji-icon">🌍</span> Spin the Globe
-        </button>
-        
-        <a id="flight-link" href="#" target="_blank">
-            Search Flights on Google ✈️
-        </a>
+    <!-- The Grid where we inject our planes -->
+    <div class="fleet-container" id="fleet-grid">
+        <!-- JavaScript will populate this -->
     </div>
 
     <footer>
-        Standard aviation only. Vertiports coming soon to Bicester.
+        &copy; 2025 Skyports Infrastructure Internal Demo. Data simulated for educational purposes.
     </footer>
 
     <script>
-        // This is an Array - a list of data objects
-        const destinations = [
-            { city: "Tokyo", country: "Japan", code: "HND" },
-            { city: "Reykjavik", country: "Iceland", code: "KEF" },
-            { city: "New York", country: "USA", code: "JFK" },
-            { city: "Cape Town", country: "South Africa", code: "CPT" },
-            { city: "Bali", country: "Indonesia", code: "DPS" },
-            { city: "Buenos Aires", country: "Argentina", code: "EZE" },
-            { city: "Rome", country: "Italy", code: "FCO" },
-            { city: "Vancouver", country: "Canada", code: "YVR" },
-            { city: "Marrakech", country: "Morocco", code: "RAK" },
-            { city: "Queenstown", country: "New Zealand", code: "ZQN" },
-            { city: "Singapore", country: "Singapore", code: "SIN" }
+        // -------------------------------------------------------
+        // THE DATABASE (JSON)
+        // This is the "Source of Truth" for your application.
+        // -------------------------------------------------------
+        const fleetData = [
+            {
+                name: "Airbus A380-800",
+                manufacturer: "Airbus",
+                type: "Long Haul",
+                seats: "469",
+                range: "9,500 miles",
+                speed: "587 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/British_Airways_A380-841_G-XLEA_ERJ_04-06-2014_%2814354537823%29.jpg/800px-British_Airways_A380-841_G-XLEA_ERJ_04-06-2014_%2814354537823%29.jpg",
+                desc: "The world's largest passenger airliner. A double-deck engineering marvel used for high-capacity long-haul routes."
+            },
+            {
+                name: "Boeing 787-10 Dreamliner",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                seats: "256",
+                range: "7,305 miles",
+                speed: "593 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/British_Airways_Boeing_787-8_Dreamliner_G-ZBJB.jpg/800px-British_Airways_Boeing_787-8_Dreamliner_G-ZBJB.jpg",
+                desc: "The longest version of the Dreamliner family. Built with composite materials for superior fuel efficiency and cabin pressure."
+            },
+            {
+                name: "Airbus A350-1000",
+                manufacturer: "Airbus",
+                type: "Long Haul",
+                seats: "331",
+                range: "10,000 miles",
+                speed: "652 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/British_Airways_A350-1000_G-XWBA_at_LHR.jpg/800px-British_Airways_A350-1000_G-XWBA_at_LHR.jpg",
+                desc: "BA's newest wide-body aircraft. Features the 'Club Suite' and is significantly quieter than previous generation aircraft."
+            },
+            {
+                name: "Boeing 777-300ER",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                seats: "299",
+                range: "7,370 miles",
+                speed: "590 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/British_Airways_Boeing_777-200ER_G-VIIO_LHR_2018.jpg/800px-British_Airways_Boeing_777-200ER_G-VIIO_LHR_2018.jpg",
+                desc: "The backbone of the BA long-haul fleet. A proven workhorse known for reliability on Atlantic routes."
+            },
+            {
+                name: "Airbus A320neo",
+                manufacturer: "Airbus",
+                type: "Short Haul",
+                seats: "180",
+                range: "3,700 miles",
+                speed: "515 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/G-TTNA_A320-251N_British_Airways_Heathrow_15-04-2019_%2847645276611%29.jpg/800px-G-TTNA_A320-251N_British_Airways_Heathrow_15-04-2019_%2847645276611%29.jpg",
+                desc: "The 'neo' stands for New Engine Option. The primary aircraft for European and Domestic UK routes."
+            },
+            {
+                name: "Embraer E190",
+                manufacturer: "Embraer",
+                type: "Short Haul",
+                seats: "98",
+                range: "2,000 miles",
+                speed: "542 mph",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/British_Airways_Embraer_190SR_G-LCYN_at_Zurich_Airport.jpg/800px-British_Airways_Embraer_190SR_G-LCYN_at_Zurich_Airport.jpg",
+                desc: "Operated by BA CityFlyer. Designed specifically for steep approaches into London City Airport."
+            }
         ];
 
-        const cityText = document.getElementById('city-text');
-        const countryText = document.getElementById('country-text');
-        const spinBtn = document.getElementById('spin-btn');
-        const flightLink = document.getElementById('flight-link');
+        const grid = document.getElementById('fleet-grid');
+        const buttons = document.querySelectorAll('.filter-btn');
 
-        let isSpinning = false;
+        // Function to display planes
+        function renderFleet(data) {
+            grid.innerHTML = ''; // Clear existing cards
 
-        function spinGlobe() {
-            if (isSpinning) return; // Prevent double clicking
-            isSpinning = true;
-            
-            // Reset UI
-            countryText.classList.remove('visible');
-            flightLink.style.display = "none";
-            spinBtn.innerText = "Spinning...";
-            spinBtn.style.backgroundColor = "#64748b"; // Grey out button
+            data.forEach(plane => {
+                const card = `
+                    <div class="card">
+                        <img src="${plane.image}" class="card-image" alt="${plane.name}">
+                        <div class="card-content">
+                            <div class="aircraft-type">${plane.manufacturer} • ${plane.type}</div>
+                            <h2 class="aircraft-name">${plane.name}</h2>
+                            <p class="description">${plane.desc}</p>
+                            
+                            <div class="specs-grid">
+                                <div class="spec-item">
+                                    <span class="spec-label">Range</span>
+                                    <span class="spec-value">${plane.range}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Speed</span>
+                                    <span class="spec-value">${plane.speed}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Seats</span>
+                                    <span class="spec-value">${plane.seats}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
 
-            let counter = 0;
-            const maxSpins = 20; // How many times names flash before stopping
-
-            // This creates the flashing animation loop
-            const interval = setInterval(() => {
-                const randomDest = destinations[Math.floor(Math.random() * destinations.length)];
-                cityText.innerText = randomDest.city;
-                counter++;
-
-                // Stop the loop when we hit maxSpins
-                if (counter > maxSpins) {
-                    clearInterval(interval);
-                    finalizeDestination(randomDest);
+        // Function to filter planes
+        function filterFleet(category) {
+            // 1. Update Filter Buttons visual state
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText.includes(category) || (category === 'all' && btn.innerText === 'Show All')) {
+                    btn.classList.add('active');
                 }
-            }, 100); // Changes every 100 milliseconds
+            });
+
+            // 2. Filter the Data
+            if (category === 'all') {
+                renderFleet(fleetData);
+            } else {
+                // We check if the Manufacturer OR the Type matches the button click
+                const filtered = fleetData.filter(plane => 
+                    plane.manufacturer === category || plane.type === category
+                );
+                renderFleet(filtered);
+            }
         }
 
-        function finalizeDestination(destination) {
-            cityText.innerText = destination.city;
-            countryText.innerText = destination.country;
-            countryText.classList.add('visible');
+        // Initial Load
+        renderFleet(fleetData);
 
-            // Construct the Google Flights URL dynamically
-            // We use the Airport Code (e.g., JFK) for accuracy
-            const flightURL = `https://www.google.com/travel/flights?q=Flights%20to%20${destination.code}`;
-            
-            flightLink.href = flightURL;
-            flightLink.style.display = "block"; // Reveal the link
-
-            // Reset button
-            spinBtn.innerText = "Spin Again 🌍";
-            spinBtn.style.backgroundColor = ""; // Reset color
-            isSpinning = false;
-        }
     </script>
 </body>
 </html>
