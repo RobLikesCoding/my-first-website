@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>British Airways Fleet | Rob Wilson</title>
+    <!-- This meta tag helps load images by telling the server "don't ask who sent me" -->
+    <meta name="referrer" content="no-referrer">
+    <title>British Airways Fleet Database | Rob Wilson</title>
     <style>
         /* BA BRANDING COLORS */
         :root {
@@ -12,10 +14,11 @@
             --ba-white: #ffffff;
             --ba-grey: #f0f0f0;
             --text-dark: #1f2937;
+            --text-light: #6b7280;
         }
 
         body {
-            font-family: 'Mylius Modern', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background-color: var(--ba-grey);
             margin: 0;
             padding: 0;
@@ -26,115 +29,184 @@
         header {
             background-color: var(--ba-blue);
             color: white;
-            padding: 40px 20px;
+            padding: 50px 20px;
             text-align: center;
-            border-bottom: 4px solid var(--ba-red);
+            border-bottom: 6px solid var(--ba-red);
         }
 
         h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 3rem;
             letter-spacing: -1px;
+            font-weight: 800;
         }
 
         .subtitle {
             font-weight: 300;
             opacity: 0.9;
             margin-top: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+        }
+
+        .last-updated {
+            font-size: 0.8rem;
+            margin-top: 15px;
+            opacity: 0.7;
+            font-family: monospace;
         }
 
         /* CONTROLS / FILTER BAR */
         .filter-bar {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             padding: 30px 20px;
             flex-wrap: wrap;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .filter-btn {
-            background-color: white;
-            border: 1px solid #ddd;
-            padding: 12px 24px;
-            border-radius: 30px;
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            padding: 10px 20px;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
-            color: var(--ba-blue);
+            font-weight: 600;
+            color: var(--text-dark);
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 0.9rem;
         }
 
         .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background-color: #e5e7eb;
         }
 
         .filter-btn.active {
             background-color: var(--ba-blue);
             color: white;
             border-color: var(--ba-blue);
+            box-shadow: 0 4px 6px rgba(7, 90, 170, 0.3);
         }
 
         /* FLEET GRID */
         .fleet-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 30px;
         }
 
         /* AIRCRAFT CARD */
         .card {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
         }
 
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image-container {
+            position: relative;
+            height: 240px;
         }
 
         .card-image {
             width: 100%;
-            height: 220px;
+            height: 100%;
             object-fit: cover;
-            border-bottom: 3px solid var(--ba-red);
+        }
+
+        .manufacturer-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
         }
 
         .card-content {
             padding: 25px;
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        .aircraft-type {
-            color: var(--ba-blue);
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+        .aircraft-header {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 15px;
         }
 
         .aircraft-name {
-            font-size: 1.8rem;
-            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+            margin: 0;
             font-weight: 800;
+            color: var(--text-dark);
         }
 
+        .fleet-status {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .dot-green { background-color: #22c55e; }
+        .dot-orange { background-color: #f97316; }
+
+        /* NOTES BADGE */
+        .note-badge {
+            display: inline-block;
+            background-color: #eff6ff;
+            color: var(--ba-blue);
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-weight: 600;
+            border: 1px solid #dbeafe;
+        }
+
+        /* SPECS GRID */
         .specs-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            background-color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: auto;
         }
 
         .spec-item {
@@ -143,40 +215,46 @@
         }
 
         .spec-label {
-            font-size: 0.75rem;
-            color: #666;
+            font-size: 0.7rem;
+            color: var(--text-light);
             text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 2px;
         }
 
         .spec-value {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .description {
+            font-weight: 600;
             font-size: 0.95rem;
-            line-height: 1.5;
-            color: #555;
-            margin-bottom: 15px;
+            color: var(--text-dark);
         }
 
+        /* SEAT CONFIG TABLE */
+        .seat-config {
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        .seat-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e5e7eb;
+            padding: 4px 0;
+        }
+        .seat-row:last-child { border-bottom: none; }
+        
         /* FOOTER */
         footer {
+            background: var(--text-dark);
+            color: white;
             text-align: center;
             padding: 40px;
-            color: #888;
             font-size: 0.9rem;
-            margin-top: 40px;
+            margin-top: 60px;
         }
 
-        /* ANIMATION */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card {
-            animation: fadeIn 0.5s ease-out forwards;
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .filter-bar { padding: 15px 10px; gap: 8px; }
+            .filter-btn { padding: 8px 12px; font-size: 0.8rem; }
         }
 
     </style>
@@ -184,93 +262,170 @@
 <body>
 
     <header>
-        <h1>The British Airways Fleet</h1>
-        <div class="subtitle">Curated by Rob Wilson | Future Flight Programme</div>
+        <h1>British Airways Fleet</h1>
+        <div class="subtitle">Mainline Passenger Aircraft Database</div>
+        <div class="last-updated">DATA SOURCE: WIKIPEDIA (SEPT 2025)</div>
     </header>
 
     <!-- Interactive Filters -->
     <div class="filter-bar">
-        <button class="filter-btn active" onclick="filterFleet('all')">Show All</button>
+        <button class="filter-btn active" onclick="filterFleet('all')">All Aircraft</button>
         <button class="filter-btn" onclick="filterFleet('Airbus')">Airbus</button>
         <button class="filter-btn" onclick="filterFleet('Boeing')">Boeing</button>
-        <button class="filter-btn" onclick="filterFleet('Long Haul')">Long Haul</button>
-        <button class="filter-btn" onclick="filterFleet('Short Haul')">Short Haul</button>
+        <button class="filter-btn" onclick="filterFleet('Club Suites')">Club Suites Equipped</button>
+        <button class="filter-btn" onclick="filterFleet('On Order')">Future Orders</button>
     </div>
 
-    <!-- The Grid where we inject our planes -->
+    <!-- The Grid -->
     <div class="fleet-container" id="fleet-grid">
         <!-- JavaScript will populate this -->
     </div>
 
     <footer>
-        &copy; 2025 Skyports Infrastructure Internal Demo. Data simulated for educational purposes.
+        <p>&copy; 2025 Skyports Infrastructure Internal Demo.</p>
+        <p style="opacity: 0.5; font-size: 0.8rem;">Data curated by Rob Wilson. Not for external publication.</p>
     </footer>
 
     <script>
         // -------------------------------------------------------
         // THE DATABASE (JSON)
-        // This is the "Source of Truth" for your application.
+        // Updated with Wiki Data (Sept 2025)
         // -------------------------------------------------------
         const fleetData = [
+            // AIRBUS FLEET
             {
                 name: "Airbus A380-800",
                 manufacturer: "Airbus",
                 type: "Long Haul",
-                seats: "469",
-                range: "9,500 miles",
-                speed: "587 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/British_Airways_A380-841_G-XLEA_ERJ_04-06-2014_%2814354537823%29.jpg/800px-British_Airways_A380-841_G-XLEA_ERJ_04-06-2014_%2814354537823%29.jpg",
-                desc: "The world's largest passenger airliner. A double-deck engineering marvel used for high-capacity long-haul routes."
-            },
-            {
-                name: "Boeing 787-10 Dreamliner",
-                manufacturer: "Boeing",
-                type: "Long Haul",
-                seats: "256",
-                range: "7,305 miles",
-                speed: "593 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/British_Airways_Boeing_787-8_Dreamliner_G-ZBJB.jpg/800px-British_Airways_Boeing_787-8_Dreamliner_G-ZBJB.jpg",
-                desc: "The longest version of the Dreamliner family. Built with composite materials for superior fuel efficiency and cabin pressure."
+                inService: 12,
+                orders: 0,
+                seats: 469,
+                config: "14F / 97J / 55W / 303Y",
+                note: "To be retrofitted late 2026",
+                image: "https://images.unsplash.com/photo-1569629743817-70d8db6c323b?auto=format&fit=crop&w=800&q=80"
             },
             {
                 name: "Airbus A350-1000",
                 manufacturer: "Airbus",
                 type: "Long Haul",
-                seats: "331",
-                range: "10,000 miles",
-                speed: "652 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/British_Airways_A350-1000_G-XWBA_at_LHR.jpg/800px-British_Airways_A350-1000_G-XWBA_at_LHR.jpg",
-                desc: "BA's newest wide-body aircraft. Features the 'Club Suite' and is significantly quieter than previous generation aircraft."
-            },
-            {
-                name: "Boeing 777-300ER",
-                manufacturer: "Boeing",
-                type: "Long Haul",
-                seats: "299",
-                range: "7,370 miles",
-                speed: "590 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/British_Airways_Boeing_777-200ER_G-VIIO_LHR_2018.jpg/800px-British_Airways_Boeing_777-200ER_G-VIIO_LHR_2018.jpg",
-                desc: "The backbone of the BA long-haul fleet. A proven workhorse known for reliability on Atlantic routes."
+                inService: 18,
+                orders: 6,
+                seats: 331,
+                config: "56J / 56W / 219Y",
+                note: "Club Suites Fitted",
+                image: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=800&q=80"
             },
             {
                 name: "Airbus A320neo",
                 manufacturer: "Airbus",
                 type: "Short Haul",
-                seats: "180",
-                range: "3,700 miles",
-                speed: "515 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/G-TTNA_A320-251N_British_Airways_Heathrow_15-04-2019_%2847645276611%29.jpg/800px-G-TTNA_A320-251N_British_Airways_Heathrow_15-04-2019_%2847645276611%29.jpg",
-                desc: "The 'neo' stands for New Engine Option. The primary aircraft for European and Domestic UK routes."
+                inService: 32,
+                orders: 5,
+                seats: 156,
+                config: "48J / 108Y",
+                note: "Plus 26 unallocated group orders",
+                image: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80"
             },
             {
-                name: "Embraer E190",
-                manufacturer: "Embraer",
+                name: "Airbus A321neo",
+                manufacturer: "Airbus",
                 type: "Short Haul",
-                seats: "98",
-                range: "2,000 miles",
-                speed: "542 mph",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/British_Airways_Embraer_190SR_G-LCYN_at_Zurich_Airport.jpg/800px-British_Airways_Embraer_190SR_G-LCYN_at_Zurich_Airport.jpg",
-                desc: "Operated by BA CityFlyer. Designed specifically for steep approaches into London City Airport."
+                inService: 18,
+                orders: 4,
+                seats: 192,
+                config: "56J / 136Y",
+                note: "Newest Short Haul Fleet",
+                image: "https://images.unsplash.com/photo-1520437358207-323b43b50729?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Airbus A320-200",
+                manufacturer: "Airbus",
+                type: "Short Haul",
+                inService: 47,
+                orders: 0,
+                seats: 156,
+                config: "48J / 108Y",
+                note: "3 aircraft in Oneworld livery",
+                image: "https://images.unsplash.com/photo-1556382225-2509b6051906?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Airbus A319-100",
+                manufacturer: "Airbus",
+                type: "Short Haul",
+                inService: 25,
+                orders: 0,
+                seats: 123,
+                config: "40J / 83Y",
+                note: "Includes 'BEA' Retro Livery (G-EUPJ)",
+                image: "https://images.unsplash.com/photo-1606768666853-403c90a981ad?auto=format&fit=crop&w=800&q=80"
+            },
+
+            // BOEING FLEET
+            {
+                name: "Boeing 777-300ER",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 16,
+                orders: 0,
+                seats: 256,
+                config: "8F / 76J / 40W / 132Y",
+                note: "Club Suites Fitted",
+                image: "https://images.unsplash.com/photo-1524592714635-d77511a4834d?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Boeing 777-200ER",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 43,
+                orders: 0,
+                seats: "235 - 336",
+                config: "Various Configs (LGW/LHR)",
+                note: "Some fitted with Club Suites",
+                image: "https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Boeing 777-9",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 0,
+                orders: 24,
+                seats: 325,
+                config: "8F / 65J / 46W / 206Y",
+                note: "Future Flagship (On Order)",
+                image: "https://images.unsplash.com/photo-1583410835647-e6663905b828?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Boeing 787-10",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 12,
+                orders: 38,
+                seats: 256,
+                config: "8F / 48J / 35W / 165Y",
+                note: "Club Suites Fitted",
+                image: "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Boeing 787-9",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 18,
+                orders: 0,
+                seats: 216,
+                config: "8F / 42J / 39W / 127Y",
+                note: "Standard Club World",
+                image: "https://images.unsplash.com/photo-1587162146766-e06b1189b907?auto=format&fit=crop&w=800&q=80"
+            },
+            {
+                name: "Boeing 787-8",
+                manufacturer: "Boeing",
+                type: "Long Haul",
+                inService: 12,
+                orders: 0,
+                seats: "204 / 214",
+                config: "31-35J / 25-37W / 136-154Y",
+                note: "Partially Retrofitted",
+                image: "https://images.unsplash.com/photo-1542296332-2e4473faf563?auto=format&fit=crop&w=800&q=80"
             }
         ];
 
@@ -281,28 +436,48 @@
         function renderFleet(data) {
             grid.innerHTML = ''; // Clear existing cards
 
+            if (data.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 50px; color: #666;">No aircraft found matching criteria.</div>';
+                return;
+            }
+
             data.forEach(plane => {
+                // Logic for order status
+                let statusHtml = '';
+                if (plane.inService > 0) {
+                    statusHtml += `<div class="status-item"><div class="dot dot-green"></div> <strong>${plane.inService}</strong> Active</div>`;
+                }
+                if (plane.orders > 0) {
+                    statusHtml += `<div class="status-item"><div class="dot dot-orange"></div> <strong>${plane.orders}</strong> On Order</div>`;
+                }
+
                 const card = `
                     <div class="card">
-                        <img src="${plane.image}" class="card-image" alt="${plane.name}">
+                        <div class="card-image-container">
+                            <img src="${plane.image}" class="card-image" alt="${plane.name}">
+                            <div class="manufacturer-badge">${plane.manufacturer}</div>
+                        </div>
                         <div class="card-content">
-                            <div class="aircraft-type">${plane.manufacturer} • ${plane.type}</div>
-                            <h2 class="aircraft-name">${plane.name}</h2>
-                            <p class="description">${plane.desc}</p>
+                            <div class="aircraft-header">
+                                <h2 class="aircraft-name">${plane.name}</h2>
+                                <div class="fleet-status">${statusHtml}</div>
+                                ${plane.note ? `<div class="note-badge">${plane.note}</div>` : ''}
+                            </div>
                             
                             <div class="specs-grid">
                                 <div class="spec-item">
-                                    <span class="spec-label">Range</span>
-                                    <span class="spec-value">${plane.range}</span>
-                                </div>
-                                <div class="spec-item">
-                                    <span class="spec-label">Speed</span>
-                                    <span class="spec-value">${plane.speed}</span>
-                                </div>
-                                <div class="spec-item">
-                                    <span class="spec-label">Seats</span>
+                                    <span class="spec-label">Total Seats</span>
                                     <span class="spec-value">${plane.seats}</span>
                                 </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Type</span>
+                                    <span class="spec-value">${plane.type}</span>
+                                </div>
+                            </div>
+
+                            <div class="seat-config">
+                                <div style="margin-bottom:5px; font-weight:700; color:#6b7280; font-size:0.7rem;">CABIN CONFIGURATION</div>
+                                <div style="color: #374151;">${plane.config}</div>
                             </div>
                         </div>
                     </div>
@@ -316,21 +491,25 @@
             // 1. Update Filter Buttons visual state
             buttons.forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.innerText.includes(category) || (category === 'all' && btn.innerText === 'Show All')) {
+                if (btn.innerText.includes(category) || (category === 'all' && btn.innerText === 'All Aircraft')) {
                     btn.classList.add('active');
                 }
             });
 
             // 2. Filter the Data
-            if (category === 'all') {
-                renderFleet(fleetData);
-            } else {
-                // We check if the Manufacturer OR the Type matches the button click
-                const filtered = fleetData.filter(plane => 
-                    plane.manufacturer === category || plane.type === category
-                );
-                renderFleet(filtered);
+            let filtered = fleetData;
+
+            if (category === 'Airbus') {
+                filtered = fleetData.filter(p => p.manufacturer === 'Airbus');
+            } else if (category === 'Boeing') {
+                filtered = fleetData.filter(p => p.manufacturer === 'Boeing');
+            } else if (category === 'Club Suites') {
+                filtered = fleetData.filter(p => p.note.includes('Club Suites'));
+            } else if (category === 'On Order') {
+                filtered = fleetData.filter(p => p.orders > 0);
             }
+
+            renderFleet(filtered);
         }
 
         // Initial Load
